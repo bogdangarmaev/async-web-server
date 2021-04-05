@@ -1,17 +1,20 @@
 import asyncio
 
-from task.models import TaskQueue
+from task.models import TaskQueue, CompletedTasks
 
 
 async def task_worker():
     """Воркер, который в фоновом режиме последовательно выполняет задачи"""
     while True:
-        current_task = TaskQueue().get_current_task()
+        task_queue = TaskQueue()
+        completed_tasks = CompletedTasks()
+        current_task = task_queue.get_current_task()
         if current_task:
             await asyncio.sleep(current_task.timeout)
-            current_task.is_active = False
+            task_queue.remove_task(current_task)
+            completed_tasks.append_task(current_task)
         else:
-            await asyncio.sleep(0.01)
+            await asyncio.sleep(0.01)  # передаем управление обратно в событийный цикл если задач нет
 
 
 async def start_background_tasks(app):

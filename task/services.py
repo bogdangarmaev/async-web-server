@@ -1,4 +1,4 @@
-from task.models import TaskQueue
+from task.models import TaskQueue, Task
 from task.validators import str_to_int
 
 
@@ -7,4 +7,6 @@ def add_task(data: dict):
     num = str_to_int(data, 'num')
     timeout = str_to_int(data, 'timeout')
     tq = TaskQueue()
-    tq.add_task(num, timeout)
+    index_num_of_last_task = tq.get_index_num_of_last_task()
+    task = Task(index_num_of_last_task + 1, num, timeout)
+    tq.add_task(task)
